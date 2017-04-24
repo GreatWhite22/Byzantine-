@@ -9,6 +9,7 @@ import java.net.Socket;
  */
 public class Server extends Thread {
     GeneralsTable table;
+    static Connector connector;
     public Server(){
         table = new GeneralsTable();
     }
@@ -16,7 +17,7 @@ public class Server extends Thread {
     public static void main(String[] args){
         Server server = new Server();
         numberOfGenerals = Integer.parseInt(args[0]);
-        System.out.println("byzantine.Server started...");
+        System.out.println("Server started...");
         try{
             ServerSocket listener = new ServerSocket(Symbols.ServerPort);
             Socket s;

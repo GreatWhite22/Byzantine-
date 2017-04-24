@@ -12,7 +12,9 @@ import java.util.Scanner;
 public class ServerThread extends Thread {
     GeneralsTable table;
     Socket theGeneral;
+    Connector connector;
     public ServerThread(GeneralsTable table, Socket s){
+        this.connector = connector;
         this.table = table;
         theGeneral = s;
     }
@@ -24,30 +26,29 @@ public class ServerThread extends Thread {
             System.out.println("received:" + command);
             Scanner st = new Scanner(command);
             String tag = st.next();
-            if(tag.equals("search")){
+            if (tag.equals("search")) {
                 InetSocketAddress addr = table.search(st.next());
-                if(addr == null){
+                if (addr == null) {
                     pout.println(0 + " " + "nullhost");
-                }
-                else{
+                } else {
                     pout.println(addr.getPort() + " " + addr.getHostName());
                 }
-            }else if(tag.equals("insert")){
+            }else if (tag.equals("insert")) {
                 int pid = st.nextInt();
                 String hostName = st.next();
                 int port = st.nextInt();
                 int retValue = table.insert(pid, hostName, port);
                 pout.println(retValue);
-            }else if(tag.equals("blockingFind")){
+            } else if (tag.equals("blockingFind")) {
                 InetSocketAddress addr = table.blockingFind(st.next());
                 pout.println(addr.getPort() + " " + addr.getHostName());
-            }else if(tag.equals("clear")){
+            } else if (tag.equals("clear")) {
                 table.clear();
             }
             pout.flush();
             theGeneral.close();
         }catch (IOException e){
-            System.out.println("Error in byzantine.ServerThread");
+            System.out.println("Error in ServerThread");
             System.err.println(e);
         }
     }

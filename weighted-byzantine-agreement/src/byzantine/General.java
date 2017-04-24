@@ -20,10 +20,15 @@ public class General extends Thread{
     PrintStream pout;
     Socket server;
 
+    General(){}
+
     General(int pid, Double weight, int proposedValue, int numberOfProcesses){
         weights = new ArrayList<Double>();
+        for(int i = 0; i < numberOfProcesses; i++){
+            weights.add(null);
+        }
         this.pid = pid;
-        weights.add(pid, weight);
+        weights.set(pid, weight);
         this.proposedValue = proposedValue;
         this.numberOfProcesses = numberOfProcesses;
         s0 = 0.0; s1 = 0.0;
@@ -43,6 +48,7 @@ public class General extends Thread{
         server.close();
         return retValue;
     }
+
     public InetSocketAddress searchName(int pid, boolean isBlocking)
             throws IOException {
         getSocket();
@@ -50,7 +56,7 @@ public class General extends Thread{
         else pout.println("search " + pid);
         pout.flush();
         String result = din.nextLine();
-        System.out.println("NameServer returned" + result);
+        System.out.println("Server returned " + result);
         Scanner sc = new Scanner(result);
         server.close();
         int portnum = sc.nextInt();
@@ -70,12 +76,16 @@ public class General extends Thread{
         proposedValue = Integer.parseInt(args[1]);
         int intWeight = Integer.parseInt(args[2]);
         double weight = intWeight/100;
+        System.out.println(weight);
         numberOfProcesses = Integer.parseInt(args[3]);
         int portNum = Integer.parseInt(args[4]);
-        /*byzantine.General general = new byzantine.General(pid, weight, proposedValue, numberOfProcesses);
-        general.insertName(pid, byzantine.Symbols.nameServer, portNum);*/
         Connector connector = new Connector();
         connector.Connect(pid, weight, proposedValue, numberOfProcesses, portNum);
-        System.out.println("byzantine.General + " + pid + " started");
+        /*byzantine.General general = new byzantine.General(pid, weight, proposedValue, numberOfProcesses);
+        general.insertName(pid, byzantine.Symbols.nameServer, portNum);*/
+        //Connector connector = new Connector();
+        //connector.Connect(pid, weight, proposedValue, numberOfProcesses, portNum);
+        System.out.println("General " + pid + " started");
+
     }
 }

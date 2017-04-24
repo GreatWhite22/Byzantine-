@@ -21,7 +21,6 @@ public class Connector {
         link = new Socket[numNeigh];
         dataIn = new ObjectInputStream[numNeigh];
         dataOut = new ObjectOutputStream[numNeigh];
-       // int localport = getLocalPort(myId);
         listener = new ServerSocket(portNum);
 
 		/* register my name in the name server */
