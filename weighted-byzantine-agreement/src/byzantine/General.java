@@ -73,9 +73,11 @@ public class General extends Thread{
 
     public static void main(String[] args) throws Exception {
         pid = Integer.parseInt(args[0]);
-        proposedValue = Integer.parseInt(args[1]);
-        int intWeight = Integer.parseInt(args[2]);
-        double weight = intWeight/100;
+        proposedValue = Integer.parseInt(args[2]);
+        int intWeight = Integer.parseInt(args[1]);
+        double weight = intWeight;
+        System.out.println(weight);
+        weight /= 100;
         System.out.println(weight);
         numberOfProcesses = Integer.parseInt(args[3]);
         int portNum = Integer.parseInt(args[4]);
