@@ -1,3 +1,4 @@
+package byzantine;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -15,7 +16,7 @@ public class Server extends Thread {
     public static void main(String[] args){
         Server server = new Server();
         numberOfGenerals = Integer.parseInt(args[0]);
-        System.out.println("Server started...");
+        System.out.println("byzantine.Server started...");
         try{
             ServerSocket listener = new ServerSocket(Symbols.ServerPort);
             Socket s;

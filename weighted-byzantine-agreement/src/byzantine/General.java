@@ -1,3 +1,5 @@
+package byzantine;
+
 import java.util.*;
 import java.net.*;
 import java.io.*;
@@ -19,6 +21,7 @@ public class General extends Thread{
     Socket server;
 
     General(int pid, Double weight, int proposedValue, int numberOfProcesses){
+        weights = new ArrayList<Double>();
         this.pid = pid;
         weights.add(pid, weight);
         this.proposedValue = proposedValue;
@@ -62,16 +65,17 @@ public class General extends Thread{
         server.close();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         pid = Integer.parseInt(args[0]);
         proposedValue = Integer.parseInt(args[1]);
-        double weight = Double.parseDouble(args[2]);
+        int intWeight = Integer.parseInt(args[2]);
+        double weight = intWeight/100;
         numberOfProcesses = Integer.parseInt(args[3]);
         int portNum = Integer.parseInt(args[4]);
-        General general = new General(pid, weight, proposedValue, numberOfProcesses);
-        general.insertName(pid, Symbols.nameServer, portNum);
+        /*byzantine.General general = new byzantine.General(pid, weight, proposedValue, numberOfProcesses);
+        general.insertName(pid, byzantine.Symbols.nameServer, portNum);*/
         Connector connector = new Connector();
-        connector.Connect(pid, );
-        System.out.println("General + " + pid + " started");
+        connector.Connect(pid, weight, proposedValue, numberOfProcesses, portNum);
+        System.out.println("byzantine.General + " + pid + " started");
     }
 }

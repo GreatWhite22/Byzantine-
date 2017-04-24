@@ -1,3 +1,5 @@
+package byzantine;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetSocketAddress;
@@ -45,7 +47,7 @@ public class ServerThread extends Thread {
             pout.flush();
             theGeneral.close();
         }catch (IOException e){
-            System.out.println("Error in ServerThread");
+            System.out.println("Error in byzantine.ServerThread");
             System.err.println(e);
         }
     }

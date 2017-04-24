@@ -1,3 +1,5 @@
+package byzantine;
+
 /**
  * Created by Connor Lewis on 4/23/2017.
  */

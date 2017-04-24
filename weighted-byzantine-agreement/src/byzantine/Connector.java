@@ -1,29 +1,32 @@
-/**
+package byzantine; /**
  * Created by Connor Lewis on 4/23/2017.
  */
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+
 public class Connector {
     ServerSocket listener; Socket[] link;
     public ObjectInputStream[] dataIn;
     public ObjectOutputStream[] dataOut;
     General generalClient;
-    public void Connect(int myId, int numberOfNeighbors)
+    public void Connect(int myId, double weight, int proposedValue, int numberOfNeighbors, int portNum)
             throws Exception {
+        generalClient = new General(myId, weight, proposedValue, numberOfNeighbors);
         int numNeigh = numberOfNeighbors;
         link = new Socket[numNeigh];
         dataIn = new ObjectInputStream[numNeigh];
         dataOut = new ObjectOutputStream[numNeigh];
-        int localport = getLocalPort(myId);
-        listener = new ServerSocket(localport);
+       // int localport = getLocalPort(myId);
+        listener = new ServerSocket(portNum);
 
 		/* register my name in the name server */
-        //generalClient.insertName(myId, (InetAddress.getLocalHost())
-        //        .getHostName(), localport);
+        generalClient.insertName(myId, (InetAddress.getLocalHost())
+                .getHostName(), portNum);
 
 		/* accept connections from all the smaller processes */
 		int pid = 0;
