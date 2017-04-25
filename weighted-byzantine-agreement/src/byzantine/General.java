@@ -9,6 +9,7 @@ import java.io.*;
  */
 public class General extends Thread{
 
+    static Connector connector;
     static int pid; //process id
     static int numberOfProcesses; // number of processes
     static int proposedValue;
@@ -79,30 +80,9 @@ public class General extends Thread{
         weight /= 100;
         numberOfProcesses = Integer.parseInt(args[3]);
         int portNum = Integer.parseInt(args[4]);
-        Connector connector = new Connector();
+        connector = new Connector();
         connector.Connect(pid, numberOfProcesses);
-
-        System.out.println(connector.link[0]);
-        System.out.println(connector.link[1]);
-        System.out.println(connector.link[2]);
-        System.out.println(connector.link[3]);
-
-
-        /*System.out.println(connector.dataIn.get(0));
-        System.out.println(connector.dataIn.get(1));
-        System.out.println(connector.dataIn.get(2));
-        System.out.println(connector.dataIn.get(3));
-        System.out.println(connector.dataOut.get(0));
-        System.out.println(connector.dataOut.get(1));
-        System.out.println(connector.dataOut.get(2));
-        System.out.println(connector.dataOut.get(3));*/
-
-
-
-        /*byzantine.General general = new byzantine.General(pid, weight, proposedValue, numberOfProcesses);
-        general.insertName(pid, byzantine.Symbols.nameServer, portNum);*/
-        //Connector connector = new Connector();
-        //connector.Connect(pid, weight, proposedValue, numberOfProcesses, portNum);
+        General general = new General(pid, weight, proposedValue, numberOfProcesses);
         System.out.println("General " + pid + " started");
 
     }
