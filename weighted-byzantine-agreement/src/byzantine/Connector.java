@@ -1,65 +1,73 @@
 package byzantine; /**
  * Created by Connor Lewis on 4/23/2017.
  */
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Connector {
     ServerSocket listener; Socket[] link;
-    public ObjectInputStream[] dataIn;
-    public ObjectOutputStream[] dataOut;
+    ArrayList<Scanner> dataIn;
+    ArrayList<PrintWriter> dataOut;
     General generalClient;
-    public void Connect(int myId, double weight, int proposedValue, int numberOfNeighbors, int portNum)
+    public void Connect(int myId, int numberOfNeighbors)
             throws Exception {
-        generalClient = new General(myId, weight, proposedValue, numberOfNeighbors);
+        generalClient = new General();
         int numNeigh = numberOfNeighbors;
         link = new Socket[numNeigh];
-        dataIn = new ObjectInputStream[numNeigh];
-        dataOut = new ObjectOutputStream[numNeigh];
-        listener = new ServerSocket(portNum);
+        dataIn = new ArrayList<Scanner>();
+        dataOut = new ArrayList<PrintWriter>();
+        for(int i = 0; i < numberOfNeighbors; i++){
+            dataIn.add(null);
+            dataOut.add(null);
+        }
+        int localport = getLocalPort(myId);
+        listener = new ServerSocket(localport);
 
 		/* register my name in the name server */
         generalClient.insertName(myId, (InetAddress.getLocalHost())
-                .getHostName(), portNum);
+                .getHostName(), localport);
 
 		/* accept connections from all the smaller processes */
 		int pid = 0;
         while (pid < numNeigh) {
             if (pid  < myId) {
                 Socket s = listener.accept();
-                InputStream is = s.getInputStream();
-                ObjectInputStream din = new ObjectInputStream(is);
-                Integer hisId = (Integer) din.readObject();
-                //int i = neighbors.indexOf(hisId);
-                String tag = (String) din.readObject();
+                Scanner din = new Scanner(s.getInputStream());
+                Integer hisId = din.nextInt();
+                System.out.println("Connecting to pid: " + hisId);
+                String tag = din.next();
                 if (tag.equals("hello")) {
                     link[hisId] = s;
-                    dataIn[hisId] = din;
-                    dataOut[hisId] = new ObjectOutputStream(
-                            s.getOutputStream()); }
+                    dataIn.set(hisId, din);
+                    dataOut.set(hisId, new PrintWriter(
+                            s.getOutputStream()));
+                }
                 pid++;
+            }else {
+                break;
             }
-            break;
         }
 		/* contact all the bigger processes */
         while (pid < numNeigh) {
+            System.out.println("Waiting for pid: " + pid);
             if (pid > myId) {
                 InetSocketAddress addr = generalClient.searchName(
                         pid, true);
                 //int i = neighbors.indexOf(pid);
                 link[pid] = new Socket(addr.getHostName(), addr.getPort());
-                dataOut[pid] = new
-                        ObjectOutputStream(link[pid].getOutputStream());
+                dataOut.set(pid, new
+                        PrintWriter(link[pid].getOutputStream()));
 				/* send a hello message to P_i */
-                dataOut[pid].writeObject(new Integer(myId));
-                dataOut[pid].writeObject(new String("hello"));
-                dataOut[pid].flush();
-                dataIn[pid] = new ObjectInputStream(link[pid].getInputStream()); }
+                dataOut.get(pid).println(myId);
+                dataOut.get(pid).println("hello");
+                dataOut.get(pid).flush();
+                dataIn.set(pid, new Scanner(link[pid].getInputStream())); }
                 pid++;
         }
     }

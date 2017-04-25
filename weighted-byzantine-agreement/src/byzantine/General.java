@@ -76,13 +76,29 @@ public class General extends Thread{
         proposedValue = Integer.parseInt(args[2]);
         int intWeight = Integer.parseInt(args[1]);
         double weight = intWeight;
-        System.out.println(weight);
         weight /= 100;
-        System.out.println(weight);
         numberOfProcesses = Integer.parseInt(args[3]);
         int portNum = Integer.parseInt(args[4]);
         Connector connector = new Connector();
-        connector.Connect(pid, weight, proposedValue, numberOfProcesses, portNum);
+        connector.Connect(pid, numberOfProcesses);
+
+        System.out.println(connector.link[0]);
+        System.out.println(connector.link[1]);
+        System.out.println(connector.link[2]);
+        System.out.println(connector.link[3]);
+
+
+        /*System.out.println(connector.dataIn.get(0));
+        System.out.println(connector.dataIn.get(1));
+        System.out.println(connector.dataIn.get(2));
+        System.out.println(connector.dataIn.get(3));
+        System.out.println(connector.dataOut.get(0));
+        System.out.println(connector.dataOut.get(1));
+        System.out.println(connector.dataOut.get(2));
+        System.out.println(connector.dataOut.get(3));*/
+
+
+
         /*byzantine.General general = new byzantine.General(pid, weight, proposedValue, numberOfProcesses);
         general.insertName(pid, byzantine.Symbols.nameServer, portNum);*/
         //Connector connector = new Connector();

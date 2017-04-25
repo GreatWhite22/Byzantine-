@@ -21,7 +21,7 @@ public class Server extends Thread {
         try{
             ServerSocket listener = new ServerSocket(Symbols.ServerPort);
             Socket s;
-            while((s = listener.accept()) !=null){
+            while((s = listener.accept()) != null){
                 Thread t = new ServerThread(server.table, s);
                 t.start();
             }

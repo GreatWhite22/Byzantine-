@@ -20,7 +20,7 @@ public class GeneralsTable {
         int pid = Integer.parseInt(sPid);
         System.out.println("Searching " + pid);
         for (GeneralEntry entry: table)
-            if (pid == entry.pid) return entry.addr;
+            if (pid == entry.pid){System.out.println("Found " + pid); return entry.addr;}
         return null;
     }
     // returns 0 if old value replaced, otherwise 1
