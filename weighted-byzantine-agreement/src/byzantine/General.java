@@ -12,10 +12,12 @@ public class General extends Thread{
     static Connector connector;
     static int pid; //process id
     static int numberOfProcesses; // number of processes
-    static int proposedValue;
-    // public float rho; // rho must be less than 1/4
-    public List<Double> weights;
+    static int myValue;
+    static int queenValue;
+    static double myWeight;
+    static double initWeight;
     public double s0, s1;
+    static Boolean finished = false;
 
     Scanner din;
     PrintStream pout;
@@ -24,15 +26,19 @@ public class General extends Thread{
     General(){}
 
     General(int pid, Double weight, int proposedValue, int numberOfProcesses){
-        weights = new ArrayList<Double>();
-        for(int i = 0; i < numberOfProcesses; i++){
-            weights.add(null);
-        }
+        myValue = proposedValue;
+        myWeight = weight;
         this.pid = pid;
-        weights.set(pid, weight);
-        this.proposedValue = proposedValue;
         this.numberOfProcesses = numberOfProcesses;
         s0 = 0.0; s1 = 0.0;
+        for(int process = 0; process < numberOfProcesses; process++){
+            if(process != pid) {
+
+                    GeneralListener listener = new GeneralListener(process, this);
+                    listener.start();
+
+            }
+        }
     }
     public void getSocket() throws IOException{
         server = new Socket(Symbols.nameServer, Symbols.ServerPort);
@@ -72,18 +78,74 @@ public class General extends Thread{
         server.close();
     }
 
+    public void receiveMsg(int fromId){
+        try{
+            Scanner sc = connector.dataIn.get(fromId);
+            String s;
+            int count = 0;
+
+            if(sc.hasNextLine()) {
+                s = sc.nextLine();
+                if(!s.equals("")) {
+                    String[] message = s.split(" ");
+                    adjustWeights(Integer.parseInt(message[3]), Double.parseDouble(message[4]), message[2]);
+                }
+            }
+
+        }catch(Exception e){
+            System.err.println(e);
+            finished = true;
+            connector.closeSockets();
+        }
+    }
+
+    public void sendMsg(int destId, int srcId, String tag, int value, double weight){
+        try{
+            String msg = destId + " " + pid + " " + tag + " " + value + " " + weight;
+            System.out.println("Sending message: " + msg);
+            PrintWriter writer = connector.dataOut.get(destId);
+            writer.println(msg);
+            writer.flush();
+        }catch (Exception e){
+            System.err.println(e);
+            finished = true;
+            connector.closeSockets();
+        }
+    }
+
+    public void adjustWeights(int valueSent, double weightSent, String tag){
+        //System.out.println("value " + valueSent + " weight " + weightSent + " tag " + tag);
+        if(tag.equals("phase1")) {
+            if(valueSent == 1){
+                //System.out.println("Value 1 received");
+                s1 += weightSent;
+            }
+            else if(valueSent == 0){
+                s0 += weightSent;
+            }
+        }
+        else if(tag.equals("queenValue")) {
+            //System.out.println("Queenvalue set as " + valueSent);
+            queenValue = valueSent;
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         pid = Integer.parseInt(args[0]);
-        proposedValue = Integer.parseInt(args[2]);
+        myValue = Integer.parseInt(args[2]);
         int intWeight = Integer.parseInt(args[1]);
-        double weight = intWeight;
-        weight /= 100;
+        initWeight = intWeight;
+        initWeight /= 100;
         numberOfProcesses = Integer.parseInt(args[3]);
         int portNum = Integer.parseInt(args[4]);
         connector = new Connector();
         connector.Connect(pid, numberOfProcesses);
-        General general = new General(pid, weight, proposedValue, numberOfProcesses);
+        General general = new General(pid, myWeight, myValue, numberOfProcesses);
         System.out.println("General " + pid + " started");
-
+        Util.mySleep(Symbols.roundTime);
+        WeightedQueen queen = new WeightedQueen(general);
+        int consensusValue = queen.decide();
+        finished = true;
+        System.out.println("Consensus value: " + consensusValue);
     }
 }
